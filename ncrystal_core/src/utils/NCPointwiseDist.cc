@@ -150,3 +150,28 @@ double NC::PointwiseDist::sampleBelow( RNG& rng, double xtrunc ) const
 
   return percentile( rng.generate() * commulIntegral( xtrunc ) );
 }
+double NC::PointwiseDist::sampleBelowTrunc( RNG& rng, double xtrunc, double xmin ) const
+{
+  //This should never happen
+  if ( xmin > xtrunc )
+   NCRYSTAL_THROW2(BadInput,"PointwiseDist::sampleBelow asked to sample point with xmin larger than xtrunc");
+  //Also this this
+  if ( xtrunc < m_x.front() ) {
+    NCRYSTAL_THROW2(BadInput,"PointwiseDist::sampleBelow asked to sample point below distribution");
+  }
+  //Fall back to sampleBelow
+  if ( xmin < m_x.front() ) {
+    return sampleBelow(rng,xtrunc);
+  }
+  //Area is zero
+  if ( xmin >= m_x.back() ) {
+    return 0;
+  }
+  double lowerInt =  commulIntegral( xmin );
+  //Makes sure you never sample below thetaMin
+  if ( xtrunc >= m_x.back() ) {
+    return percentile(lowerInt + rng.generate() * ( 1 - lowerInt ));
+  }
+
+  return percentile(lowerInt + rng.generate() * (commulIntegral( xtrunc ) - lowerInt ));
+}

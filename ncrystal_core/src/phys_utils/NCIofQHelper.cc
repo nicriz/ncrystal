@@ -39,7 +39,7 @@ NC::IofQHelper::IofQHelper( internal_t data )
 {
 }
 
-NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin = 0)
+NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin)
   : IofQHelper([&Q,&IofQ,thetaMin]() -> internal_t
   {
     auto n = Q.size();
@@ -64,6 +64,8 @@ NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin =
       --n;
 
     internal_t res;
+    if (!(abs(thetaMin)<NC::kPiHalf))
+      NCRYSTAL_THROW(BadInput,"IofQHelper got an invalid thetaMin");
     res.thetaMin = thetaMin;
     auto& q = res.Q;
     auto& f = res.QtimesIofQ;

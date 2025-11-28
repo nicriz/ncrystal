@@ -86,7 +86,7 @@ namespace NCRYSTAL_NAMESPACE {
 // Inline implementations //
 ////////////////////////////
 
-inline NCrystal::IofQHelper::IofQHelper( const std::pair<VectD,VectD>& QI, double thetaMin = 0 )
+inline NCrystal::IofQHelper::IofQHelper( const std::pair<VectD,VectD>& QI, double thetaMin )
   : IofQHelper(QI.first,QI.second,thetaMin)
 {
 }
@@ -108,6 +108,7 @@ inline double NCrystal::IofQHelper::calcQIofQIntegralMin( NeutronEnergy ekin ) c
   constexpr double kkk = 4.0 * ekin2ksq(1.0);
   const double twok = std::sqrt( kkk * ekin.dbl() );
   double fullInt = m_pwdist.commulIntegral( twok ) * m_normFact;
+  
   double lowerInt = m_pwdist.commulIntegral( twok*sin(m_thetaMin) ) * m_normFact;
   return fullInt - lowerInt;
 }
@@ -116,7 +117,7 @@ inline double NCrystal::IofQHelper::sampleQValue( RNG& rng, NeutronEnergy ekin )
 {
   constexpr double kkk = 4.0 * ekin2ksq(1.0);
   const double twok = std::sqrt( kkk * std::min<double>(m_ekinMax.dbl(),ekin.dbl()) );
-  return m_pwdist.sampleBelow( rng, twok );
+  return m_pwdist.sampleBelowTrunc( rng, twok, twok*sin(m_thetaMin) );
 }
 
 #endif

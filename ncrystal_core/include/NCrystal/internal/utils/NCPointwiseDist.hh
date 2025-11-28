@@ -57,6 +57,7 @@ namespace NCRYSTAL_NAMESPACE {
     //Sample distribution, truncated at some value (throws BadInput exception if
     //xtrunc is less than first x-value in distribution):
     double sampleBelow( RNG& rng, double xtrunc ) const;
+    double sampleBelowTrunc( RNG& rng, double xtrunc, double xmin ) const;
 
     //Access CDF (normalised, so last value is 1.0):
     const VectD& getCDF() const { return m_cdf; }
