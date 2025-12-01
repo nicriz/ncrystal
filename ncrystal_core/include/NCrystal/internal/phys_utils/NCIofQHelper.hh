@@ -55,7 +55,7 @@ namespace NCRYSTAL_NAMESPACE {
     //The class is constructed from Q and I(Q) values:
 
     IofQHelper( const VectD& Q, const VectD& IofQ);
-    IofQHelper( const std::pair<VectD,VectD>& Q_and_IofQ );
+    IofQHelper( const std::pair<VectD,VectD>& Q_and_IofQ);
 
     //Calculate the integral of Q*I(Q) from Q=0 to Qmax=2k, where k is the
     //wavenumber of the neutron of the provided energy. Note that to convert it
@@ -84,8 +84,8 @@ namespace NCRYSTAL_NAMESPACE {
 // Inline implementations //
 ////////////////////////////
 
-inline NCrystal::IofQHelper::IofQHelper( const std::pair<VectD,VectD>& QI, double thetaMin )
-  : IofQHelper(QI.first,QI.second,thetaMin)
+inline NCrystal::IofQHelper::IofQHelper( const std::pair<VectD,VectD>& QI)
+  : IofQHelper(QI.first,QI.second)
 {
 }
 
