@@ -54,15 +54,14 @@ namespace NCRYSTAL_NAMESPACE {
 
     //The class is constructed from Q and I(Q) values:
 
-    IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin = 0 );
-    IofQHelper( const std::pair<VectD,VectD>& Q_and_IofQ, double thetaMin = 0 );
+    IofQHelper( const VectD& Q, const VectD& IofQ);
+    IofQHelper( const std::pair<VectD,VectD>& Q_and_IofQ );
 
     //Calculate the integral of Q*I(Q) from Q=0 to Qmax=2k, where k is the
     //wavenumber of the neutron of the provided energy. Note that to convert it
     //to a cross section one must still multiply it with a factor of c/E where c
     //is an appropriate constant and E is the neutron energy:
     double calcQIofQIntegral( NeutronEnergy ) const;
-    double calcQIofQIntegralMin( NeutronEnergy ) const;
 
     //Sample a Q value according to Q*I(Q) over the interval from Q=0 to
     //Qmax=2k, where k is the wavenumber of the neutron of the provided energy:
@@ -74,7 +73,6 @@ namespace NCRYSTAL_NAMESPACE {
   private:
     PointwiseDist m_pwdist;
     NeutronEnergy m_ekinMax;
-    double m_thetaMin;
     double m_normFact;
     struct internal_t;
     IofQHelper( internal_t );
@@ -100,24 +98,12 @@ inline double NCrystal::IofQHelper::calcQIofQIntegral( NeutronEnergy ekin ) cons
   return m_pwdist.commulIntegral( twok ) * m_normFact;
 }
 
-inline double NCrystal::IofQHelper::calcQIofQIntegralMin( NeutronEnergy ekin ) const
-{
-  if ( ekin >= m_ekinMax )
-    return m_normFact;
-  
-  constexpr double kkk = 4.0 * ekin2ksq(1.0);
-  const double twok = std::sqrt( kkk * ekin.dbl() );
-  double fullInt = m_pwdist.commulIntegral( twok ) * m_normFact;
-  
-  double lowerInt = m_pwdist.commulIntegral( twok*sin(m_thetaMin) ) * m_normFact;
-  return fullInt - lowerInt;
-}
 
 inline double NCrystal::IofQHelper::sampleQValue( RNG& rng, NeutronEnergy ekin ) const
 {
   constexpr double kkk = 4.0 * ekin2ksq(1.0);
   const double twok = std::sqrt( kkk * std::min<double>(m_ekinMax.dbl(),ekin.dbl()) );
-  return m_pwdist.sampleBelowTrunc( rng, twok, twok*sin(m_thetaMin) );
+  return m_pwdist.sampleBelow( rng, twok );
 }
 
 #endif

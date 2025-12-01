@@ -27,20 +27,18 @@ struct NC::IofQHelper::internal_t
 {
   VectD Q;
   VectD QtimesIofQ;
-  double thetaMin;
   double normFact;
 };
 
 NC::IofQHelper::IofQHelper( internal_t data )
   : m_pwdist( std::move(data.Q),std::move(data.QtimesIofQ) ),
     m_ekinMax( NeutronEnergy{ ksq2ekin( ncsquare( 0.5 * m_pwdist.getXVals().back() ) ) } ),
-    m_thetaMin(data.thetaMin),
     m_normFact(data.normFact)
 {
 }
 
-NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin)
-  : IofQHelper([&Q,&IofQ,thetaMin]() -> internal_t
+NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ)
+  : IofQHelper([&Q,&IofQ]() -> internal_t
   {
     auto n = Q.size();
     if ( !nc_is_grid(Q) )
@@ -64,9 +62,7 @@ NC::IofQHelper::IofQHelper( const VectD& Q, const VectD& IofQ, double thetaMin)
       --n;
 
     internal_t res;
-    if (!(abs(thetaMin)<NC::kPiHalf))
-      NCRYSTAL_THROW(BadInput,"IofQHelper got an invalid thetaMin");
-    res.thetaMin = thetaMin;
+
     auto& q = res.Q;
     auto& f = res.QtimesIofQ;
     if ( Q.front() > 0 ) {
